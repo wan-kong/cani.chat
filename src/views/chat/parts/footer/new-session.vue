@@ -10,7 +10,18 @@
         <DropdownMenuContent>
             <DropdownMenuLabel>新建会话</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Prompt API</DropdownMenuItem>
+            <DropdownMenuItem>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            Prompt API
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Add to library</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </DropdownMenuItem>
             <DropdownMenuItem>Summarizer API</DropdownMenuItem>
             <DropdownMenuItem>Language Detector API</DropdownMenuItem>
             <DropdownMenuItem>Translator API</DropdownMenuItem>
@@ -31,6 +42,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 </script>
 

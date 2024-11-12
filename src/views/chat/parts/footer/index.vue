@@ -1,10 +1,10 @@
 <template>
     <div class="flex-shrink-0 p-2 flex items-center justify-around">
+        <DarkMode></DarkMode>
+        <GitHub></GitHub>
         <DataProcessing></DataProcessing>
         <HomeOrTips></HomeOrTips>
-        <GitHub></GitHub>
         <NewSession></NewSession>
-        <DarkMode></DarkMode>
     </div>
 </template>
 
