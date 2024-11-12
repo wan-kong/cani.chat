@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import UnoCSS from 'unocss/vite'
 import { fileURLToPath, URL } from 'node:url'
 import tailwind from 'tailwindcss'
 
@@ -13,8 +12,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  plugins: [vue(), UnoCSS(),
-  ],
+  plugins: [vue(),],
   server: {
     port: 9999
   },
