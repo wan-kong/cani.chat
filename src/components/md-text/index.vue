@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
 })
 
 const contentRef = ref<HTMLDivElement>()
-const { renderMarkdown, } = useMarkdownRender({
+const { renderMarkdown } =  useMarkdownRender({
   html: props.html,
 })
 

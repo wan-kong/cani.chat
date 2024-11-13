@@ -20,5 +20,3 @@
 
 <script setup lang="ts" name="sessionItem">
 </script>
-
-<style scoped lang="scss"></style>

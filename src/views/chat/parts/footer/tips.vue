@@ -13,5 +13,3 @@
 <script setup lang="ts" name="tips">
 import { Button } from '@/components/ui/button'
 </script>
-
-<style scoped lang="scss"></style>

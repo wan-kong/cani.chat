@@ -1,10 +1,10 @@
 <template>
     <div class="h-full flex flex-col overflow-hidden">
-        <div class="w-full flex-shrink-0 sticky top-0 p-4 bg-secondary">
+        <div class="w-full flex-shrink-0 sticky top-0 p-4 py-3 border-b border border-x-0 border-t-0">
             Chat To Chrome
         </div>
         <div class="flex-1 h-0 flex flex-col flex-shrink-0 overflow-y-auto px-4 py-4 overflow-x-hidden" ref="scrollRef">
-            <msgItem v-for="item in 100" :key="item" :role="item % 2 === 0 ? 'system' : 'user'"></msgItem>
+            <msgItem v-for="item in 10" :key="item" :role="item % 2 === 0 ? 'system' : 'user'"></msgItem>
         </div>
     </div>
 </template>
@@ -18,5 +18,3 @@ onMounted(() => {
     scrollToBottom()
 })
 </script>
-
-<style scoped lang="scss"></style>
