@@ -24,11 +24,11 @@ import inputBox from './parts/input-box/index.vue'
         <ResizableHandle />
         <ResizablePanel>
             <ResizablePanelGroup direction="vertical">
-                <ResizablePanel :max-size="86" :default-size="86">
+                <ResizablePanel :max-size="90" :default-size="92" :min-size="70">
                     <chatBox></chatBox>
                 </ResizablePanel>
                 <ResizableHandle />
-                <ResizablePanel>
+                <ResizablePanel style="min-height: 120px;">
                     <inputBox></inputBox>
                 </ResizablePanel>
             </ResizablePanelGroup>

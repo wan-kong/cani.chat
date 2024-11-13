@@ -10,7 +10,7 @@
         <DropdownMenuContent>
             <DropdownMenuLabel>新建会话</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem @click="handleNewSession">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -22,11 +22,11 @@
                     </Tooltip>
                 </TooltipProvider>
             </DropdownMenuItem>
-            <DropdownMenuItem>Summarizer API</DropdownMenuItem>
-            <DropdownMenuItem>Language Detector API</DropdownMenuItem>
-            <DropdownMenuItem>Translator API</DropdownMenuItem>
-            <DropdownMenuItem>Writer API</DropdownMenuItem>
-            <DropdownMenuItem>Rewriter API</DropdownMenuItem>
+            <DropdownMenuItem @click="handleNewSession">Summarizer API</DropdownMenuItem>
+            <DropdownMenuItem @click="handleNewSession">Language Detector API</DropdownMenuItem>
+            <DropdownMenuItem @click="handleNewSession">Translator API</DropdownMenuItem>
+            <DropdownMenuItem @click="handleNewSession">Writer API</DropdownMenuItem>
+            <DropdownMenuItem @click="handleNewSession">Rewriter API</DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>
@@ -49,4 +49,13 @@ import {
     TooltipTrigger
 } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
+import { useGlobalState } from '@/lib/store';
+import { Model } from '@/types/interface';
+
+const store = useGlobalState()
+
+
+const handleNewSession = () => {
+    store.addSession('新会话', Model.Prompt)
+}
 </script>
