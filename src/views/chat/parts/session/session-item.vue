@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full border rounded-md p-3 hover:bg-accent cursor-pointer transition-all relative group">
+    <div class="w-full mb-2 border rounded-md p-3 hover:bg-accent cursor-pointer transition-all relative group">
         <div class="w-full relative line-clamp-1">
             Lorem ipsum, dolor sit amet consectetur adipisicing elit.
         </div>

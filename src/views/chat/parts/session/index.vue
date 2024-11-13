@@ -20,17 +20,17 @@
                 </svg>
             </span>
         </div>
-        <div class="flex flex-col overflow-y-auto px-2 mt-2 gap-2">
+        <ScrollArea class="flex flex-col px-2 mt-2 gap-2">
             <sessionItem v-for="item in 10" :key="item"></sessionItem>
-        </div>
+        </ScrollArea>
     </div>
 </template>
 
 <script setup lang="ts" name="sessionPart">
 import { ref } from 'vue'
 import { Input } from '@/components/ui/input'
-
 import sessionItem from './session-item.vue'
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const filterKey = ref('')
 
