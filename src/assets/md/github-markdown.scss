@@ -121,8 +121,8 @@ html {
 }
 
 .markdown-body mark {
-  color: hsl(var(--muted));
-  background-color: hsl(var(--destructive));
+  color: #ffffff;
+  background-color: hsl(var(--destructive) / 80);
 }
 
 .markdown-body small {

@@ -8,7 +8,7 @@
                 </MdText>
             </div>
             <div :class="cn('mt-1 flex text-gray-500', isUser ? 'flex-row' : 'flex-row-reverse')">
-                <Button variant="ghost" size="icon" @click="copy('123')">
+                <Button variant="ghost" size="icon" @click="copy('123')" title="复制内容">
                     <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" class="size-3" viewBox="0 0 24 24"
                         fill="currentColor">
                         <path
@@ -22,7 +22,7 @@
                         </path>
                     </svg>
                 </Button>
-                <Button variant="ghost" size="icon" @click="copy('123')">
+                <Button variant="ghost" size="icon" @click="copy('123')" title="删除这条数据">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-3" fill="currentColor">
                         <path
                             d="M10.5859 12L2.79297 4.20706L4.20718 2.79285L12.0001 10.5857L19.793 2.79285L21.2072 4.20706L13.4143 12L21.2072 19.7928L19.793 21.2071L12.0001 13.4142L4.20718 21.2071L2.79297 19.7928L10.5859 12Z">
