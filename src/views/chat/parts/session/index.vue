@@ -21,7 +21,7 @@
             </span>
         </div>
         <div class="flex flex-col overflow-y-auto px-2 mt-2 gap-2">
-            <sessionItem v-for="item in 100" :key="item"></sessionItem>
+            <sessionItem v-for="item in 10" :key="item"></sessionItem>
         </div>
     </div>
 </template>
