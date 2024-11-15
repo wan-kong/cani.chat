@@ -2,7 +2,7 @@
     <div class="h-full flex flex-col p-2 gap-2">
         <Textarea v-model="inputVal" :disabled="activeUserInput?.disabled"
             class="w-full flex-1 h-0 min-h-5 resize-none focus-visible:shadow-none"
-            :placeholder="activeUserInput?.placeholder ?? DEFAULT_PLACEHOLDER" @keydown="handleKeyDown"></Textarea>
+            :placeholder="activeUserInput?.placeholder || DEFAULT_PLACEHOLDER" @keydown="handleKeyDown"></Textarea>
         <div class="flex flex-shrink-0 w-full items-center justify-between">
             <div class="flex items-center justify-center text-sm text-slate-500">
                 答案由AI生成，可能存在错误，请注意甄别。
@@ -25,6 +25,8 @@ import { useGlobalState } from '@/lib/store';
 import { useComposition } from '@/hooks/useComposition';
 import { getKeyDownHandler, KEYBOARD_KEY } from '@/lib/keyboard';
 import { DEFAULT_PLACEHOLDER } from '@/config';
+import { useChromeAI } from '@/hooks/useChromeAi';
+import { getUUID, parseTime } from '@/lib/utils';
 const store = useGlobalState()
 
 const activeUserInput = computed(() => store.activeUserInput)
@@ -40,9 +42,40 @@ const inputVal = computed({
 
 const { isComposing } = useComposition()
 
+let sessionID: string, messageID: string;
+
+const { startTask } = useChromeAI({
+    mode: 'assistant',
+    onDataUpdate: (data) => {
+        store.updateMessageItem({
+            id: messageID,
+            content: data,
+            update_at: parseTime(Date.now()),
+        }, sessionID)
+    }
+})
+
 const handleSendData = () => {
     if (inputVal.value) {
-        console.log('to send Data')
+        sessionID = store.activeSessionId
+        store.addMessageItem({
+            id: getUUID(),
+            content: inputVal.value,
+            role: 'user',
+            create_at: parseTime(Date.now()),
+            update_at: parseTime(Date.now()),
+            session_id: sessionID,
+        })
+        startTask(inputVal.value)
+        messageID = getUUID()
+        store.addMessageItem({
+            id: messageID,
+            content: '正在生成中...',
+            role: 'assistant',
+            create_at: parseTime(Date.now()),
+            update_at: parseTime(Date.now()),
+            session_id: sessionID,
+        })
     } else {
         console.warn("user input data is empty string")
     }

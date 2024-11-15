@@ -21,4 +21,22 @@ export default defineConfig({
       plugins: [tailwind(), autoprefixer()],
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vue: ['vue', '@vueuse/core', 'radix-vue'],
+          pinia: ['pinia', 'pinia-plugin-persistedstate'],
+          markdown: [
+            'markdown-it',
+            'markdown-it-for-inline',
+            'markdown-it-mark',
+          ],
+          lucide: ['lucide-vue-next'],
+          highlight: ['highlight.js'],
+          utilities: ['class-variance-authority', 'clsx'],
+        }
+      }
+    }
+  }
 })

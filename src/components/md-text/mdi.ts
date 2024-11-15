@@ -1,11 +1,9 @@
 import type { Options } from 'markdown-it'
 import MarkdownIt from 'markdown-it'
-import mathJax3 from 'markdown-it-mathjax3'
 import mark from 'markdown-it-mark'
 import hljs from 'highlight.js'
-import iterator from 'markdown-it-for-inline'
-import mdKatex from '@traptitech/markdown-it-katex'
 
+import iterator from 'markdown-it-for-inline'
 
 
 function highlightBlock(str: string, lang = 'code') {
@@ -33,7 +31,7 @@ export const useMarkdownRender = (options?: Options) => {
     })
     mdi.use(iterator, 'url_new_win', 'link_open', (tokens: any, idx: any) => {
       tokens[idx].attrPush(['target', '_blank'])
-    }).use(mathJax3).use(mark).use(mdKatex, { blockClass: 'katexmath-block', errorColor: ' #cc0000' })
+    }).use(mark)
   }
 
   initMarkdownIt()

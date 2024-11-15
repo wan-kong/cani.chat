@@ -20,27 +20,32 @@
                 </svg>
             </span>
         </div>
+        <NewSession />
         <ScrollArea class="flex flex-col px-2 mt-2 gap-2">
             <sessionItem v-for="item in showList" :key="item.id" :info="item"
-                :active="item.id === store.activeSessionId" @click="handleSetActiveSession(item.id)">>
+                :active="item.id === store.activeSessionId" @click="handleSetActiveSession(item.id)"
+                @delete="handleDeleteSession(item.id)">
             </sessionItem>
         </ScrollArea>
     </div>
 </template>
 
 <script setup lang="ts" name="sessionPart">
-import { computed, ref } from 'vue'
+import { computed,ref } from 'vue'
 import { Input } from '@/components/ui/input'
 import sessionItem from './session-item.vue'
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGlobalState } from '@/lib/store';
 import type { SessionItem } from '@/types/interface';
+import NewSession from './new-session.vue';
 
 const store = useGlobalState()
 
-
 const handleSetActiveSession = (sessionId: SessionItem['id']) => {
     store.setActiveSessionId(sessionId)
+}
+const handleDeleteSession = (sessionId: SessionItem['id']) => {
+    store.deleteSession(sessionId)
 }
 
 const filterKey = ref('')

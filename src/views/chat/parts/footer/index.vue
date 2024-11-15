@@ -4,7 +4,6 @@
         <GitHub></GitHub>
         <DataProcessing></DataProcessing>
         <HomeOrTips></HomeOrTips>
-        <NewSession></NewSession>
     </div>
 </template>
 
@@ -12,6 +11,5 @@
 import DataProcessing from './data-processing.vue'
 import HomeOrTips from './tips.vue'
 import GitHub from './github.vue'
-import NewSession from './new-session.vue'
 import DarkMode from './dark-mode.vue';
 </script>

@@ -1,11 +1,6 @@
 
-export enum Role {
-    USER = 'user',
-    SYSTEM = 'system'
-}
-
 export enum Model {
-    Prompt = 'prompt',
+    Prompt = 'assistant',
     Summarizer = 'summarizer',
     LanguageDetector = 'language_detector',
     Translator = 'translator',
@@ -16,6 +11,8 @@ export enum Model {
 export interface SessionItem {
     id: string;
     name: string;
+    // 是否不可
+    deletable?: boolean;
     mode: Model;
     create_at: string;
     update_at: string;
@@ -24,7 +21,7 @@ export interface SessionItem {
 export interface MessageItem {
     id: string
     session_id: SessionItem['id']
-    role: Role
+    role: AILanguageModelInitialPromptRole
     content: string
     create_at: string
     update_at: string

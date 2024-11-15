@@ -79,6 +79,6 @@
     @apply w-full h-full bg-background flex items-center justify-center;
   }
   .container {
-    @apply h-full 2xl:h-5/6 p-2 bg-card shadow-lg rounded-lg;
+    @apply h-full 2xl:h-5/6 p-2 bg-card shadow-lg rounded-lg transition-all duration-500;
   }
 }

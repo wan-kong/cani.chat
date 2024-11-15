@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-export const parseTime = (time: string | Date, format = 'YY-MM-DD hh:ii:ss') => {
+export const parseTime = (time: string | Date | number, format = 'YY-MM-DD hh:ii:ss') => {
   const date = new Date(time)
   const year = date.getFullYear()
   const month = date.getMonth() + 1

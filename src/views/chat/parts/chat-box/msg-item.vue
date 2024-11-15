@@ -2,9 +2,9 @@
     <div class="w-full group">
         <div :class="cn('flex flex-col', isUser ? 'w-max-[80%] items-end' : 'items-start')">
             <div :class="cn('px-2 mt-1 p-4',
-                isUser ? 'max-w-[80%] w-max border bg-gray-10 rounded-md transition-all' : 'w-full'
+                isUser ? 'max-w-[80%] w-max border bg-gray-10 rounded-md transition-all p-2' : 'w-full'
             )">
-                <MdText :text="text" html>
+                <MdText :text="info.content" html>
                 </MdText>
             </div>
             <div
@@ -12,7 +12,7 @@
                 <TooltipProvider :delayDuration="200" disableClosingTrigger>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" @click="copy('123')" title="复制内容">
+                            <Button variant="ghost" size="icon" @click="copy(props.info.content)" title="复制内容">
                                 <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                     fill="currentColor">
                                     <path
@@ -60,7 +60,7 @@
 import { Button } from '@/components/ui/button'
 import { useClipboard } from '@vueuse/core'
 import { cn } from '@/lib/utils'
-import { computed, ref } from 'vue'
+import { computed} from 'vue'
 import MdText from '@/components/md-text/index.vue'
 
 import {
@@ -75,27 +75,11 @@ import {
     TooltipContent,
     TooltipTrigger
 } from '@/components/ui/tooltip'
+import { MessageItem } from '@/types/interface'
 
 const props = defineProps<{
-    role: 'system' | 'user'
+    info:MessageItem
 }>()
-const isUser = computed(() => props.role === 'user')
+const isUser = computed(() => props.info.role === 'user')
 const { copy, copied } = useClipboard()
-const text = ref(`
-### 你好
-Lorem ipsum dolor sit amet consectetur adipisicing elit.Perferendis velit quibusdam omnis nihil quia, et, nemo cumque consequatur quod hic aliquid architecto, recusandae incidunt iusto nobis placeat deleniti? Quidem, illo?
-\`\`\`shell
-echo "hello world"
-ps | grep "hello" 
-\`\`\`
-
-\`\`\`javascript
-const a = 1
-\`\`\`
-
-> 引用
-
-==123==
-
-`)
 </script>

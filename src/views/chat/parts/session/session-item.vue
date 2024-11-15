@@ -1,7 +1,6 @@
 <template>
     <div
-        :class="cn('w-full mb-2 border rounded-md p-3 hover:bg-accent cursor-pointer transition-all relative group', props.active ? 'bg-accent' : '')"
-        >
+        :class="cn('w-full mb-2 border rounded-md p-3 hover:bg-accent cursor-pointer transition-all relative group', props.active ? 'bg-accent' : '')">
         <div class="w-full relative line-clamp-1">
             {{ props.info.name }}
         </div>
@@ -9,7 +8,7 @@
             <div class="flex-1 text-ellipsis text-nowrap overflow-hidden">{{ props.info.mode }}</div>
             <div class="flex-shrink-0">{{ parseTimeAgo(props.info.create_at) }}</div>
         </div>
-        <Popover>
+        <Popover v-if="info.deletable !== false">
             <PopoverTrigger asChild
                 class="opacity-0 absolute top-2 right-2 size-4 text-muted-foreground hover:text-red-500 transition-all group-hover:opacity-100">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -24,7 +23,7 @@
                     <PopoverClose asChild>
                         <Button variant="outline" size="sm">取消</Button>
                     </PopoverClose>
-                    <Button variant="destructive" size="sm">删除</Button>
+                    <Button variant="destructive" size="sm" @click="emits('delete')">删除</Button>
                 </div>
             </PopoverContent>
         </Popover>
@@ -36,11 +35,13 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger, PopoverClose
-
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { SessionItem } from '@/types/interface';
 import { cn, parseTimeAgo } from '@/lib/utils';
+const emits = defineEmits<{
+    (ev: 'delete'): void
+}>()
 
 const props = defineProps<{
     info: SessionItem
