@@ -23,7 +23,7 @@ export const useGlobalState = defineStore('store', {
             name: "使用说明",
             id: READ_ME_ID,
             deletable: false,
-            mode: 'assistant',
+            mode: 'languageModel',
             create_at: parseTime(new Date()),
             update_at: parseTime(new Date())
         }],
@@ -51,7 +51,7 @@ export const useGlobalState = defineStore('store', {
         }
     },
     actions: {
-        addSession(name: SessionItem['name'], mode: AIMode = 'assistant') {
+        addSession(name: SessionItem['name'], mode: AIMode = 'languageModel') {
             const id = getUUID()
             this.sessionList.push({
                 id: id,

@@ -3,7 +3,7 @@ declare global {
 
     interface Window {
         ai: {
-            readonly assistant: AIAssistantFactory;
+            readonly languageModel: AIAssistantFactory;
             readonly writer: AIWriterFactory;
             readonly rewriter: AIRewriterFactory;
             readonly summarizer: AISummarizerFactory;
@@ -214,7 +214,7 @@ declare global {
     interface ReadableStream<R = any> {
         [Symbol.asyncIterator](): AsyncIterableIterator<R>;
     }
-    
+
     type AIMode = keyof typeof window.ai
 
 }

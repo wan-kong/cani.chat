@@ -63,7 +63,7 @@ const handleSendData = () => {
 
         cancelMap.set(messageID, controller)
         chatToChrome(inputVal.value, {
-            mode: store.activeSession?.mode ?? 'assistant',
+            mode: store.activeSession?.mode ?? 'languageModel',
             taskOptions: {
                 signal: controller.signal
             },

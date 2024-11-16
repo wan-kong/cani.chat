@@ -5,16 +5,16 @@ export const modeList: {
     disabled?: boolean
 }[] = [{
     name: 'Prompt API',
-    mode: 'assistant',
-}, {
-    name: 'Summarizer API',
-    mode: 'summarizer',
+    mode: 'languageModel',
 }, {
     name: 'Writer API',
     mode: 'writer',
 }, {
     name: 'Rewriter API',
     mode: 'rewriter',
+}, {
+    name: 'Summarizer API',
+    mode: 'summarizer',
 }, {
     name: 'Translator API',
     mode: 'summarizer',

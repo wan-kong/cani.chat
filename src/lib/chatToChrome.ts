@@ -1,21 +1,21 @@
 import { formateLog } from "./utils";
 
 type AIModeOptionsMap = {
-    assistant: AIAssistantCreateOptions;
+    languageModel: AIAssistantCreateOptions;
     rewriter: AIRewriterCreateOptions;
     summarizer: AISummarizerCreateOptions;
     writer: AIWriterCreateOptions;
 };
 
 type AIModeTaskOptionsMap = {
-    assistant: AIAssistantPromptOptions;
+    languageModel: AIAssistantPromptOptions;
     rewriter: AIRewriterRewriteOptions;
     summarizer: AISummarizerSummarizeOptions;
     writer: AIWriterWriteOptions;
 };
 
 type AIModeInstanceMap = {
-    assistant: AIAssistant;
+    languageModel: AIAssistant;
     rewriter: AIRewriter;
     summarizer: AISummarizer;
     writer: AIWriter;
@@ -44,7 +44,7 @@ type PromiseFunctionKeys<T> = {
 
 function _getTaskKey<T extends AIMode>(mode: T, async = true) {
     const taskKeys = {
-        assistant: 'prompt',
+        languageModel: 'prompt',
         rewriter: 'rewrite',
         summarizer: 'summarize',
         writer: 'write'

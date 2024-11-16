@@ -12,7 +12,7 @@ export const useChromeAIReady = () => {
             }
             loading.value = true
             if ('ai' in window && 'assistant' in window.ai) {
-                window.ai.assistant.capabilities().then((res) => {
+                window.ai.languageModel.capabilities().then((res) => {
                     status.value = res.available
                     if (res.available === 'readily') {
                         resolve("readily")
