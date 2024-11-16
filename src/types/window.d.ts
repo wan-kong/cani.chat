@@ -210,10 +210,13 @@ declare global {
         create(options?: AIAssistantCreateOptions): Promise<AIAssistant>;
         capabilities(): Promise<AIAssistantCapabilities>;
     }
-    
+
     interface ReadableStream<R = any> {
         [Symbol.asyncIterator](): AsyncIterableIterator<R>;
     }
+    
+    type AIMode = keyof typeof window.ai
+
 }
 
 export { }

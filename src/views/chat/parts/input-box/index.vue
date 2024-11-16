@@ -7,29 +7,29 @@
             <div class="flex items-center justify-center text-sm text-slate-500">
                 答案由AI生成，可能存在错误，请注意甄别。
             </div>
-            <div class="flex-shrink-0">
-                <Button variant="outline" @click="handleSendData()" :disabled="activeUserInput?.disabled" size="sm"
-                    title="发送">
-                    发送(Enter)
-                </Button>
-            </div>
+            <SendButton :disabled="activeUserInput?.disabled || (inputVal ?? '') === ''"
+                :loading="activeUserInput?.loading ?? false" @send="handleSendData()" @cancel="handleCancelData()">
+            </SendButton>
         </div>
     </div>
 </template>
 
 <script setup lang="ts" name="inputBox">
 import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button';
 import { computed } from 'vue'
 import { useGlobalState } from '@/lib/store';
 import { useComposition } from '@/hooks/useComposition';
 import { getKeyDownHandler, KEYBOARD_KEY } from '@/lib/keyboard';
 import { DEFAULT_PLACEHOLDER } from '@/config';
-import { useChromeAI } from '@/hooks/useChromeAi';
-import { getUUID, parseTime } from '@/lib/utils';
+import { formateLog, getUUID, parseTime } from '@/lib/utils';
+import { chatToChrome } from '@/lib/chatToChrome';
+import { SessionItem } from '@/types/interface';
+import SendButton from './send-button.vue';
+
 const store = useGlobalState()
 
 const activeUserInput = computed(() => store.activeUserInput)
+
 
 const inputVal = computed({
     get: () => {
@@ -42,42 +42,72 @@ const inputVal = computed({
 
 const { isComposing } = useComposition()
 
-let sessionID: string, messageID: string;
+let cancelMap = new Map<SessionItem['id'], AbortController>()
 
-const { startTask } = useChromeAI({
-    mode: 'assistant',
-    onDataUpdate: (data) => {
-        store.updateMessageItem({
-            id: messageID,
-            content: data,
-            update_at: parseTime(Date.now()),
-        }, sessionID)
-    }
-})
 
 const handleSendData = () => {
     if (inputVal.value) {
-        sessionID = store.activeSessionId
+        const sessionID = store.activeSessionId
+        const messageID = getUUID()
+        const controller = new AbortController()
+
         store.addMessageItem({
             id: getUUID(),
             content: inputVal.value,
             role: 'user',
+            status: 'completed',
             create_at: parseTime(Date.now()),
             update_at: parseTime(Date.now()),
             session_id: sessionID,
+        }, sessionID)
+
+        cancelMap.set(messageID, controller)
+        chatToChrome(inputVal.value, {
+            mode: store.activeSession?.mode ?? 'assistant',
+            taskOptions: {
+                signal: controller.signal
+            },
+            onDataUpdate: (data) => {
+                store.updateMessageItem({
+                    id: messageID,
+                    content: data,
+                    status: "running",
+                    update_at: parseTime(Date.now()),
+                }, sessionID)
+            },
+            onCompleted: () => {
+                store.updateMessageItem({
+                    id: messageID,
+                    status: 'completed',
+                    update_at: parseTime(Date.now()),
+                }, sessionID)
+                cancelMap.delete(messageID)
+                store.setUserInputLoading(false, sessionID)
+            }
         })
-        startTask(inputVal.value)
-        messageID = getUUID()
+        inputVal.value = ''
         store.addMessageItem({
             id: messageID,
             content: '正在生成中...',
             role: 'assistant',
+            status: 'loading',
             create_at: parseTime(Date.now()),
             update_at: parseTime(Date.now()),
             session_id: sessionID,
         })
+        store.setUserInputLoading(true, sessionID)
     } else {
-        console.warn("user input data is empty string")
+        formateLog("Submit", "User input data is empty string", "error")
+    }
+}
+
+const handleCancelData = () => {
+    const sessionID = store.activeSessionId
+    const abortFN = cancelMap.get(sessionID)?.abort
+    if (abortFN) {
+        abortFN()
+        cancelMap.delete(sessionID)
+        store.setUserInputLoading(false, sessionID)
     }
 
 }
@@ -101,5 +131,7 @@ const handleKeyDown = getKeyDownHandler(new Map([
     ],
 ])
 )
+
+
 
 </script>

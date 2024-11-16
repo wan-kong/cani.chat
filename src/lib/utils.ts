@@ -62,3 +62,7 @@ export function is(val: unknown, type: string) {
 export function isString(val: unknown): val is string {
   return is(val, 'String')
 }
+
+export const formateLog = (mode: string, ...args: any) => {
+  console.log(`%c${mode}`, 'color:#fff;background-color:#007bff;padding:2px 5px', ...args)
+}

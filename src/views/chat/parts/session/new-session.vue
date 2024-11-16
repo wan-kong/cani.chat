@@ -11,7 +11,7 @@
         <DropdownMenuContent side="right" align="start" :side-offset="-2">
             <DropdownMenuLabel>请选择会话对象</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem v-for="item in modeList" @click="handleNewSession" :disabled="item.disabled">
+            <DropdownMenuItem v-for="item in modeList" @click="handleNewSession(item.mode)" :disabled="item.disabled">
                 <div class="w-full">
                     {{ item.name }}
                 </div>
@@ -32,14 +32,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { useGlobalState } from '@/lib/store';
-import { Model } from '@/types/interface';
 
 const store = useGlobalState()
 
-
-
-
-const handleNewSession = () => {
-    store.addSession('新会话', Model.Prompt)
+const handleNewSession = (mode: AIMode) => {
+    store.addSession('新会话', mode)
 }
 </script>

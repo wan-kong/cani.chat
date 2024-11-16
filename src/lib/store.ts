@@ -1,5 +1,5 @@
-import { SessionItem, MessageItem, UserInput, Model } from '@/types/interface'
-import { getUUID, parseTime } from './utils'
+import { SessionItem, MessageItem, UserInput } from '@/types/interface'
+import { formateLog, getUUID, parseTime } from './utils'
 import { READ_ME_ID } from '@/config'
 import { createPinia, defineStore } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
@@ -23,11 +23,14 @@ export const useGlobalState = defineStore('store', {
             name: "使用说明",
             id: READ_ME_ID,
             deletable: false,
-            mode: Model.Prompt,
+            mode: 'assistant',
             create_at: parseTime(new Date()),
             update_at: parseTime(new Date())
         }],
-        messageList: [],
+        messageList: [{
+            session_id: READ_ME_ID,
+            message: []
+        }],
         userInputList: [{
             session_id: READ_ME_ID,
             placeholder: "说明文档，请仔细看",
@@ -48,7 +51,7 @@ export const useGlobalState = defineStore('store', {
         }
     },
     actions: {
-        addSession(name: SessionItem['name'], mode: Model = Model.Prompt) {
+        addSession(name: SessionItem['name'], mode: AIMode = 'assistant') {
             const id = getUUID()
             this.sessionList.push({
                 id: id,
@@ -73,7 +76,7 @@ export const useGlobalState = defineStore('store', {
             if (item) {
                 this.activeSessionId = id
             } else {
-                throw new Error('[setActiveSessionId],session_id not found')
+                formateLog("setActiveSessionId", "session_id not found")
             }
         },
         setSessionName(name: string, session_id?: SessionItem['id']) {
@@ -82,7 +85,7 @@ export const useGlobalState = defineStore('store', {
             if (index > -1) {
                 this.sessionList[index].name = name
             } else {
-                throw new Error('[setSessionName],session_id not found')
+                formateLog("setSessionName", "session_id not found")
             }
         },
         deleteUserInput(session_id: SessionItem['id']) {
@@ -90,7 +93,7 @@ export const useGlobalState = defineStore('store', {
             if (index > -1) {
                 this.userInputList[index].content = ""
             } else {
-                throw new Error('[deleteUserInput],session_id not found')
+                formateLog("deleteUserInput", "session_id not found")
             }
         },
         deleteMessageList(session_id: SessionItem['id']) {
@@ -98,7 +101,7 @@ export const useGlobalState = defineStore('store', {
             if (index > -1) {
                 this.messageList[index].message = []
             } else {
-                throw new Error('[deleteMessageList],session_id not found')
+                formateLog("deleteMessageList", "session_id not found")
             }
         },
         deleteSession(session_id: SessionItem['id']) {
@@ -118,7 +121,7 @@ export const useGlobalState = defineStore('store', {
             if (index > -1) {
                 this.userInputList[index].content = content
             } else {
-                throw new Error('[setUserInputContent],session_id not found')
+                formateLog("setUserInputContent", "session_id not found")
             }
         },
         addMessageItem(message: MessageItem, session_id?: SessionItem['id']) {
@@ -127,7 +130,7 @@ export const useGlobalState = defineStore('store', {
             if (index > -1) {
                 this.messageList[index].message.push(message)
             } else {
-                throw new Error('[addMessageItem],session_id not found')
+                formateLog("addMessageItem", "session_id not found")
             }
         },
         updateMessageItem(message: Partial<MessageItem> & Pick<MessageItem, 'id'>, session_id?: SessionItem['id']) {
@@ -138,10 +141,33 @@ export const useGlobalState = defineStore('store', {
                 if (messageIndex > -1) {
                     this.messageList[index].message[messageIndex] = Object.assign({}, this.messageList[index].message[messageIndex], message)
                 } else {
-                    throw new Error('[updateMessageItem],message_id not found')
+                    formateLog("updateMessageItem", "message_id not found")
                 }
             } else {
-                throw new Error('[updateMessageItem],session_id not found')
+                formateLog("updateMessageItem", "session_id not found")
+            }
+        },
+        deleteMessage(messageID: MessageItem['id'], session_id?: SessionItem['id']) {
+            const id = session_id ?? this.activeSessionId
+            const index = this.messageList.findIndex(item => item.session_id === id)
+            if (index > -1) {
+                const messageIndex = this.messageList[index].message.findIndex(item => item.id === messageID)
+                if (messageIndex > -1) {
+                    this.messageList[index].message.splice(messageIndex, 1)
+                } else {
+                    formateLog("deleteMessage", "message_id not found")
+                }
+            } else {
+                formateLog("deleteMessage", "session_id not found")
+            }
+        },
+        setUserInputLoading(loading: boolean, session_id?: SessionItem['id']) {
+            const id = session_id ?? this.activeSessionId
+            const index = this.userInputList.findIndex(item => item.session_id === id)
+            if (index > -1) {
+                this.userInputList[index].loading = loading
+            } else {
+                formateLog("setUserInputLoading", "session_id not found")
             }
         }
 

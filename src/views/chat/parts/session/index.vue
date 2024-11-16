@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts" name="sessionPart">
-import { computed,ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Input } from '@/components/ui/input'
 import sessionItem from './session-item.vue'
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -53,7 +53,7 @@ const filterKey = ref('')
 const showList = computed(() => {
     return store.sessionList.filter(item => {
         return item.name.includes(filterKey.value)
-    })
+    }).reverse()
 })
 
 
