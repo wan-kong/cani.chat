@@ -1,9 +1,15 @@
 <template>
     <div class="w-full group">
         <div :class="cn('flex flex-col', isUser ? 'w-max-[80%] items-end' : 'items-start')">
-            <div :class="cn('max-w-[80%]  px-2 mt-1 border w-max bg-gray-10 rounded-md transition-all p-2 min-h-10',
-                isUser ? 'bg-[#1a73e8] text-white ' : 'bg-white text-black dark:bg-gray-800 dark:text-white'
+            <div :class="cn('max-w-[80%]  px-2 mt-1 border w-max bg-gray-10 rounded-md transition-all p-2 min-h-10 hover:shadow-md',
+                isUser ? 'bg-[#1a73e8] text-white' :
+                    info.status === 'error' ? 'bg-rose-500 text-white' :
+                        'bg-white text-black dark:bg-gray-800 dark:text-white'
+
             )">
+                <div v-if="info.status === 'error'" class="mb-2">
+                    生成失败，难搞哦 😣
+                </div>
                 <div v-if="info.status === 'loading'" class="flex items-center justify-start">
                     <div class="animate-spin mx-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -12,7 +18,7 @@
                             </path>
                         </svg>
                     </div>
-                    别急，我在思考🤔
+                    别急，我在思考 🤔
                 </div>
                 <MdText :text="info.content" html v-else>
                 </MdText>

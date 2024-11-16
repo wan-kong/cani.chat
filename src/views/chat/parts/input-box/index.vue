@@ -83,6 +83,16 @@ const handleSendData = () => {
                 }, sessionID)
                 cancelMap.delete(messageID)
                 store.setUserInputLoading(false, sessionID)
+            },
+            onError: (error) => {
+                store.updateMessageItem({
+                    id: messageID,
+                    content: error?.message ?? error.toString(),
+                    status: 'error',
+                    update_at: parseTime(Date.now()),
+                }, sessionID)
+                cancelMap.delete(messageID)
+                store.setUserInputLoading(false, sessionID)
             }
         })
         inputVal.value = ''

@@ -32,6 +32,7 @@ interface UseChromeAiOptions<T extends AIMode> {
     async?: boolean
     onDataUpdate?: (data: string) => void
     onCompleted?: () => void
+    onError?: (error: any) => void
     // 会话参数
     sessionOptions?: SessionOptions<T>
     // 任务参数
@@ -58,27 +59,33 @@ export async function chatToChrome<T extends AIMode>(input: string, options: Use
     const mode = options.mode
     formateLog("CHAT", `开始对话，使用模型${mode},输入：${input}`)
     const isAsync = options?.async ?? true
-    const session = await window.ai[mode].create() as any
-    // ts写不明白了，先用any了
-    const taskKey = _getTaskKey(mode, isAsync)
-    if (isAsync) {
-        const stream = await session[taskKey](input,
-            {
-                ...options?.taskOptions
-            }) as ReadableStream<string>
-        for await (const chunk of stream) {
-            formateLog("CHAT", `流式对话记载，输出：${chunk}`)
-            options?.onDataUpdate?.(chunk)
-        }
-        options?.onCompleted?.()
+    try {
+        const session = await window.ai[mode].create() as any
+        // ts写不明白了，先用any了
+        const taskKey = _getTaskKey(mode, isAsync)
+        if (isAsync) {
+            const stream = await session[taskKey](input,
+                {
+                    ...options?.taskOptions
+                }) as ReadableStream<string>
+            for await (const chunk of stream) {
+                formateLog("CHAT", `流式对话加载，输出：${chunk}`)
+                options?.onDataUpdate?.(chunk)
+            }
+            options?.onCompleted?.()
 
-    } else {
-        const res = await session[taskKey](input, {
-            ...options?.taskOptions
-        }) as string
-        formateLog("CHAT", `对话完成，输出：${res}`)
-        options?.onDataUpdate?.(res)
-        options?.onCompleted?.()
+        } else {
+            const res = await session[taskKey](input, {
+                ...options?.taskOptions
+            }) as string
+            formateLog("CHAT", `对话完成，输出：${res}`)
+            options?.onDataUpdate?.(res)
+            options?.onCompleted?.()
+        }
+
+        session.destroy()
+    } catch (error) {
+        formateLog("CHAT", `对话出错，错误：${error}`)
+        options?.onError?.(error)
     }
-    session.destroy()
 }
