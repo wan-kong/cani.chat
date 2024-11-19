@@ -1,33 +1,33 @@
 import { formateLog } from "./utils";
 
-type AIModeOptionsMap = {
+type AIModelOptionsMap = {
     languageModel: AIAssistantCreateOptions;
     rewriter: AIRewriterCreateOptions;
     summarizer: AISummarizerCreateOptions;
     writer: AIWriterCreateOptions;
 };
 
-type AIModeTaskOptionsMap = {
+type AIModelTaskOptionsMap = {
     languageModel: AIAssistantPromptOptions;
     rewriter: AIRewriterRewriteOptions;
     summarizer: AISummarizerSummarizeOptions;
     writer: AIWriterWriteOptions;
 };
 
-type AIModeInstanceMap = {
+type AIModelInstanceMap = {
     languageModel: AIAssistant;
     rewriter: AIRewriter;
     summarizer: AISummarizer;
     writer: AIWriter;
 };
 
-type SessionOptions<T extends AIMode> = T extends keyof AIModeOptionsMap ? AIModeOptionsMap[T] : AIAssistantCreateOptions;
-type TaskOptions<T extends AIMode> = T extends keyof AIModeTaskOptionsMap ? AIModeTaskOptionsMap[T] : AIAssistantPromptOptions;
-type AIInstance<T extends AIMode> = T extends keyof AIModeInstanceMap ? AIModeInstanceMap[T] : AIAssistant;
+type SessionOptions<T extends AIModel> = T extends keyof AIModelOptionsMap ? AIModelOptionsMap[T] : AIAssistantCreateOptions;
+type TaskOptions<T extends AIModel> = T extends keyof AIModelTaskOptionsMap ? AIModelTaskOptionsMap[T] : AIAssistantPromptOptions;
+type AIInstance<T extends AIModel> = T extends keyof AIModelInstanceMap ? AIModelInstanceMap[T] : AIAssistant;
 
-interface UseChromeAiOptions<T extends AIMode> {
+interface UseChromeAiOptions<T extends AIModel> {
     // 要使用的模型
-    mode: T
+    model: T
     // 是否使用数据流方式 （默认为 true: 流式输出）
     async?: boolean
     onDataUpdate?: (data: string) => void
@@ -43,7 +43,7 @@ type PromiseFunctionKeys<T> = {
 }[keyof T];
 
 
-function _getTaskKey<T extends AIMode>(mode: T, async = true) {
+function _getTaskKey<T extends AIModel>(mode: T, async = true) {
     const taskKeys = {
         languageModel: 'prompt',
         rewriter: 'rewrite',
@@ -55,8 +55,8 @@ function _getTaskKey<T extends AIMode>(mode: T, async = true) {
 }
 
 
-export async function chatToChrome<T extends AIMode>(input: string, options: UseChromeAiOptions<T>) {
-    const mode = options.mode
+export async function chatToChrome<T extends AIModel>(input: string, options: UseChromeAiOptions<T>) {
+    const mode = options.model
     formateLog("CHAT", `开始对话，使用模型${mode},输入：${input}`)
     const isAsync = options?.async ?? true
     try {

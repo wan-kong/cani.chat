@@ -1,4 +1,4 @@
-import { SessionItem, MessageItem, UserInput } from '@/types/interface'
+import { SessionItem, MessageItem, UserInput,  } from '@/types/interface'
 import { formateLog, getUUID, parseTime } from './utils'
 import { READ_ME_ID } from '@/config'
 import { createPinia, defineStore } from 'pinia'
@@ -23,7 +23,7 @@ export const useGlobalState = defineStore('store', {
             name: "使用说明",
             id: READ_ME_ID,
             deletable: false,
-            mode: 'languageModel',
+            model: 'languageModel',
             create_at: parseTime(new Date()),
             update_at: parseTime(new Date())
         }],
@@ -51,12 +51,12 @@ export const useGlobalState = defineStore('store', {
         }
     },
     actions: {
-        addSession(name: SessionItem['name'], mode: AIMode = 'languageModel') {
+        addSession(name: SessionItem['name'], model: AIModel = 'languageModel') {
             const id = getUUID()
             this.sessionList.push({
                 id: id,
                 name,
-                mode,
+                model,
                 create_at: parseTime(new Date()),
                 update_at: parseTime(new Date())
             })

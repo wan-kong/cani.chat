@@ -1,12 +1,5 @@
 
-export enum Model {
-    Prompt = 'assistant',
-    Summarizer = 'summarizer',
-    LanguageDetector = 'language_detector',
-    Translator = 'translator',
-    Writer = 'writer',
-    ReWriter = 'rewriter',
-}
+
 export type AILanguageModelInitialPromptStatus = 'loading' | "running" | 'completed' | 'error'
 
 export interface SessionItem {
@@ -14,7 +7,7 @@ export interface SessionItem {
     name: string;
     // 是否不可
     deletable?: boolean;
-    mode: AIMode;
+    model: AIModel;
     create_at: string;
     update_at: string;
 }

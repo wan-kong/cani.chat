@@ -5,7 +5,7 @@
             {{ props.info.name }}
         </div>
         <div class="flex-shrink-0 text-sm text-muted-foreground overflow-hidden flex items-center justify-between">
-            <div class="flex-1 text-ellipsis text-nowrap overflow-hidden">{{ props.info.mode }}</div>
+            <div class="flex-1 text-ellipsis text-nowrap overflow-hidden">{{ props.info.model }}</div>
             <div class="flex-shrink-0">{{ parseTimeAgo(props.info.create_at) }}</div>
         </div>
         <Popover v-if="info.deletable !== false">

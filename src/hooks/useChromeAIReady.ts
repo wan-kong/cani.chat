@@ -1,3 +1,4 @@
+import { checkIsChrome, chromeVersion } from "@/lib/utils"
 import { ref } from "vue"
 
 export const useChromeAIReady = () => {
@@ -7,11 +8,15 @@ export const useChromeAIReady = () => {
 
     const checkStatus = (): Promise<AICapabilityAvailability> => {
         return new Promise((resolve, reject) => {
+            // 判断是否是Chrome浏览器且版本大于130
+            if(!checkIsChrome || chromeVersion <=130 ){
+                resolve("no")
+            }
             if (status.value === 'readily') {
                 resolve("readily")
             }
             loading.value = true
-            if ('ai' in window && 'assistant' in window.ai) {
+            if ('ai' in window && 'languageModel' in window.ai) {
                 window.ai.languageModel.capabilities().then((res) => {
                     status.value = res.available
                     if (res.available === 'readily') {
@@ -28,7 +33,10 @@ export const useChromeAIReady = () => {
             }
         })
     }
-    checkStatus()
+
+    checkStatus().then((res)=>{
+        status.value = res
+    })
 
     return {
         loading,

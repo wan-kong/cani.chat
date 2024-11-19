@@ -15,10 +15,9 @@ declare global {
         signal?: AbortSignal;
     }
 
-    declare type AICapabilityAvailability = "readily" | "after_download" | "no"
-
-    declare type AILanguageModelPromptRole = "user" | 'assistant'
-    declare type AILanguageModelInitialPromptRole = "system" | AILanguageModelPromptRole;
+    type AICapabilityAvailability = "readily" | "after_download" | "no"
+    type AILanguageModelPromptRole = "user" | 'assistant'
+    type AILanguageModelInitialPromptRole = "system" | AILanguageModelPromptRole;
 
     interface AICreateMonitor {
         addEventListener(type: "downloadprogress", listener: (ev: { loaded: number; total: number }) => void, options?: boolean | AddEventListenerOptions): void;
@@ -214,8 +213,8 @@ declare global {
     interface ReadableStream<R = any> {
         [Symbol.asyncIterator](): AsyncIterableIterator<R>;
     }
-
-    type AIMode = keyof typeof window.ai
+    
+    type AIModel = keyof typeof window.ai
 
 }
 

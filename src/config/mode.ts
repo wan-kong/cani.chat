@@ -1,7 +1,7 @@
 
 export const modeList: {
     name: string,
-    mode: AIMode,
+    mode: AIModel,
     disabled?: boolean
 }[] = [{
     name: 'Prompt API',

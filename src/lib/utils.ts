@@ -66,3 +66,14 @@ export function isString(val: unknown): val is string {
 export const formateLog = (mode: string, ...args: any) => {
   console.log(`%c${mode}`, 'color:#fff;background-color:#007bff;padding:2px 5px', ...args)
 }
+
+export const checkIsChrome = (() => {
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.indexOf('chrome') > -1;
+})();
+
+export const chromeVersion = (() => {
+  const ua = navigator.userAgent.toLowerCase();
+  const version = ua.match(/chrome\/([\d.]+)/)
+  return parseInt((version && version[1]) ?? '0')
+})()

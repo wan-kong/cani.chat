@@ -1,5 +1,6 @@
 <template>
     <div class="flex-shrink-0">
+        <!-- <processButton :value="processValue"></processButton> -->
         <Button variant="outline" v-if="props.loading" @click="emits('cancel')" size="sm" title="取消">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <path
@@ -14,8 +15,9 @@
 </template>
 
 <script setup lang="ts" name="sendButton">
+import { ref } from 'vue';
+// import processButton from './process-button.vue';
 import { Button } from '@/components/ui/button';
-
 const emits = defineEmits<{
     (ev: 'send'): void
     (ev: 'cancel'): void
@@ -25,7 +27,16 @@ const props = defineProps<{
     disabled: boolean
     loading: boolean
 }>()
-
+const processValue = ref(0)
+const creaseValue = () => {
+    setTimeout(() => {
+        processValue.value = processValue.value + 1
+        if (processValue.value < 100) {
+            creaseValue()
+        }
+    }, 200);
+}
+creaseValue()
 
 </script>
 

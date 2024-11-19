@@ -35,7 +35,7 @@ import { useGlobalState } from '@/lib/store';
 
 const store = useGlobalState()
 
-const handleNewSession = (mode: AIMode) => {
+const handleNewSession = (mode: AIModel) => {
     store.addSession('新会话', mode)
 }
 </script>

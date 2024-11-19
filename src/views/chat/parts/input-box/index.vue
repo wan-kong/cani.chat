@@ -25,11 +25,11 @@ import { formateLog, getUUID, parseTime } from '@/lib/utils';
 import { chatToChrome } from '@/lib/chatToChrome';
 import { SessionItem } from '@/types/interface';
 import SendButton from './send-button.vue';
+import { useModelDownload } from '@/hooks/useModelDownload';
 
 const store = useGlobalState()
 
 const activeUserInput = computed(() => store.activeUserInput)
-
 
 const inputVal = computed({
     get: () => {
@@ -44,10 +44,12 @@ const { isComposing } = useComposition()
 
 let cancelMap = new Map<SessionItem['id'], AbortController>()
 
+const { sessionOption } = useModelDownload()
 
 const handleSendData = () => {
     if (inputVal.value) {
         const sessionID = store.activeSessionId
+        const model = store.activeSession?.model ?? 'languageModel'
         const messageID = getUUID()
         const controller = new AbortController()
 
@@ -60,10 +62,12 @@ const handleSendData = () => {
             update_at: parseTime(Date.now()),
             session_id: sessionID,
         }, sessionID)
-
         cancelMap.set(messageID, controller)
         chatToChrome(inputVal.value, {
-            mode: store.activeSession?.mode ?? 'languageModel',
+            model: model,
+            sessionOptions: {
+                ...sessionOption(model),
+            },
             taskOptions: {
                 signal: controller.signal
             },
