@@ -1,4 +1,3 @@
-
 declare global {
 
     interface Window {
@@ -26,15 +25,15 @@ declare global {
     }
     type AICreateMonitorCallback = (monitor: AICreateMonitor) => void;
 
-
     // AIWriter
     // see more : https://github.com/WICG/writing-assistance-apis?tab=readme-ov-file#summarizer-api
-    interface AIWriterFactory {
+
+    class AIWriterFactory {
         create(options?: AIWriterCreateOptions): Promise<AIWriter>;
         capabilities(): Promise<AIWriterCapabilities>;
     }
 
-    interface AIWriter {
+    class AIWriter {
         write(writingTask: string, options?: AIWriterWriteOptions): Promise<string>;
         writeStreaming(writingTask: string, options?: AIWriterWriteOptions): ReadableStream<string>;
 
@@ -46,25 +45,27 @@ declare global {
         destroy(): void;
     }
 
-    interface AIWriterCapabilities {
+    class AIWriterCapabilities {
         readonly available: AICapabilityAvailability;
 
         createOptionsAvailable(options: AIWriterCreateCoreOptions): AICapabilityAvailability;
         languageAvailable(languageTag: string): AICapabilityAvailability;
     }
 
-    interface AIWriterCreateCoreOptions {
+    class AIWriterCreateCoreOptions {
         tone?: AIWriterTone;
         format?: AIWriterFormat;
         length?: AIWriterLength;
     }
 
-    interface AIWriterCreateOptions extends AIWriterCreateCoreOptions, AIBaseOptions {
+    class AIWriterCreateOptions extends AIWriterCreateCoreOptions implements AIBaseOptions {
+        signal?: AbortSignal;
         monitor?: AICreateMonitorCallback;
         sharedContext?: string;
     }
 
-    interface AIWriterWriteOptions extends AIBaseOptions {
+    class AIWriterWriteOptions implements AIBaseOptions {
+        signal?: AbortSignal;
         context?: string;
     }
 
@@ -72,15 +73,14 @@ declare global {
     type AIWriterFormat = "plain-text" | "markdown";
     type AIWriterLength = "short" | "medium" | "long";
 
-
     // summarizer 
 
-    interface AISummarizerFactory {
+    class AISummarizerFactory {
         create(options?: Partial<AISummarizerCreateOptions>): Promise<AISummarizer>;
         capabilities(): Promise<AISummarizerCapabilities>;
     }
 
-    interface AISummarizer {
+    class AISummarizer {
         summarize(input: string, options?: AISummarizerSummarizeOptions): Promise<string>;
         summarizeStreaming(input: string, options?: AISummarizerSummarizeOptions): ReadableStream<string>;
 
@@ -92,25 +92,27 @@ declare global {
         destroy(): void;
     }
 
-    interface AISummarizerCapabilities {
+    class AISummarizerCapabilities {
         readonly available: AICapabilityAvailability;
 
         createOptionsAvailable(options: AISummarizerCreateCoreOptions): AICapabilityAvailability;
         languageAvailable(languageTag: string): AICapabilityAvailability;
     }
 
-    interface AISummarizerCreateCoreOptions {
+    class AISummarizerCreateCoreOptions {
         type?: AISummarizerType;
         format?: AISummarizerFormat;
         length?: AISummarizerLength;
     }
 
-    interface AISummarizerCreateOptions extends AISummarizerCreateCoreOptions, AIBaseOptions {
+    class AISummarizerCreateOptions extends AISummarizerCreateCoreOptions implements AIBaseOptions {
+        signal?: AbortSignal;
         monitor?: AICreateMonitorCallback;
         sharedContext?: string;
     }
 
-    interface AISummarizerSummarizeOptions extends AIBaseOptions {
+    class AISummarizerSummarizeOptions implements AIBaseOptions {
+        signal?: AbortSignal;
         context?: string;
     }
 
@@ -118,14 +120,13 @@ declare global {
     type AISummarizerFormat = "plain-text" | "markdown";
     type AISummarizerLength = "short" | "medium" | "long";
 
-
     // rewriter
-    interface AIRewriterFactory {
+    class AIRewriterFactory {
         create(options?: AIRewriterCreateOptions): Promise<AIRewriter>;
         capabilities(): Promise<AIRewriterCapabilities>;
     }
 
-    interface AIRewriter {
+    class AIRewriter {
         rewrite(input: string, options?: AIRewriterRewriteOptions): Promise<string>;
         rewriteStreaming(input: string, options?: AIRewriterRewriteOptions): ReadableStream<string>;
 
@@ -137,25 +138,27 @@ declare global {
         destroy(): void;
     }
 
-    interface AIRewriterCapabilities {
+    class AIRewriterCapabilities {
         readonly available: AICapabilityAvailability;
 
         createOptionsAvailable(options: AIRewriterCreateCoreOptions): AICapabilityAvailability;
         languageAvailable(languageTag: string): AICapabilityAvailability;
     }
 
-    interface AIRewriterCreateCoreOptions {
+    class AIRewriterCreateCoreOptions {
         tone?: AIRewriterTone;
         format?: AIRewriterFormat;
         length?: AIRewriterLength;
     }
 
-    interface AIRewriterCreateOptions extends AIRewriterCreateCoreOptions, AIBaseOptions {
+    class AIRewriterCreateOptions extends AIRewriterCreateCoreOptions implements AIBaseOptions {
+        signal?: AbortSignal;
         monitor?: AICreateMonitorCallback;
         sharedContext?: string;
     }
 
-    interface AIRewriterRewriteOptions extends AIBaseOptions {
+    class AIRewriterRewriteOptions implements AIBaseOptions {
+        signal?: AbortSignal;
         context?: string;
     }
 
@@ -166,10 +169,11 @@ declare global {
     // AIAssistant
     // see more :https://github.com/explainers-by-googlers/prompt-api/
 
-    interface AIAssistantPromptOptions extends AIBaseOptions {
+    class AIAssistantPromptOptions implements AIBaseOptions {
+        signal?: AbortSignal;
     }
 
-    interface AIAssistant {
+    class AIAssistant {
         prompt(input: string, options?: AIAssistantPromptOptions): Promise<string>;
         promptStreaming(input: string, options?: AIAssistantPromptOptions): ReadableStream<string>;
 
@@ -183,20 +187,22 @@ declare global {
         destroy(): void;
 
         clone(): Promise<AIAssistant>;
-
     }
 
-    interface AIAssistantCreateOptions extends AIBaseOptions {
+    class AIAssistantCreateOptions implements AIBaseOptions {
+        signal?: AbortSignal;
         monitor?: AICreateMonitorCallback;
         sharedContext?: string;
-        systemPrompt?: string
+        systemPrompt?: string;
         initialPrompts?: {
             role: AILanguageModelInitialPromptRole,
             content: string
-        }[]
+        }[];
     }
+    type AIAssistantCreateOptionsWithOutSystemPrompt = Exclude<AIAssistantCreateOptions, 'system'>
+    type AIAssistantCreateOptionsWithOutInitialPrompts = Exclude<AIAssistantCreateOptions, 'initialPrompts'>
 
-    interface AIAssistantCapabilities {
+    class AIAssistantCapabilities {
         readonly available: AICapabilityAvailability;
         readonly defaultTemperature: number;
         // Always null if available === "no"
@@ -204,16 +210,15 @@ declare global {
         readonly maxTopK: number;
     }
 
-
-    interface AIAssistantFactory {
-        create(options?: AIAssistantCreateOptions): Promise<AIAssistant>;
+    class AIAssistantFactory {
+        create(options?: AIAssistantCreateOptionsWithOutSystemPrompt | AIAssistantCreateOptionsWithOutInitialPrompts): Promise<AIAssistant>;
         capabilities(): Promise<AIAssistantCapabilities>;
     }
 
     interface ReadableStream<R = any> {
         [Symbol.asyncIterator](): AsyncIterableIterator<R>;
     }
-    
+
     type AIModel = keyof typeof window.ai
 
 }

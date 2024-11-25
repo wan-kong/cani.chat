@@ -24,7 +24,6 @@ import editableTitle from './editable-title.vue';
 import { computed, onMounted, onUpdated, ref } from 'vue';
 import { useGlobalState } from '@/lib/store';
 import { MessageItem } from '@/types/interface';
-import { formateLog } from '@/lib/utils';
 
 const scrollRef = ref<InstanceType<typeof ScrollArea>>()
 
@@ -41,14 +40,12 @@ const scrollToBottomIfAtBottom = () => {
     const element = scrollRef.value?.$el?.children?.[0]
     if (element === undefined) return
     const distanceToBottom = element.scrollHeight - element.scrollTop - element.clientHeight
-    formateLog('scrollToBottomIfAtBottom', distanceToBottom)
     if (distanceToBottom <= threshold) {
         scrollToBottom()
     }
 }
 
 onUpdated(() => {
-    formateLog("scrollToBottomIfAtBottom")
     scrollToBottomIfAtBottom()
 })
 
