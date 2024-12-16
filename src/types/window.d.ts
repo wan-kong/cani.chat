@@ -14,7 +14,7 @@ declare global {
         signal?: AbortSignal;
     }
 
-    type AICapabilityAvailability = "readily" | "after_download" | "no"
+    type AICapabilityAvailability = "readily" | "after-download" | "no"
     type AILanguageModelPromptRole = "user" | 'assistant'
     type AILanguageModelInitialPromptRole = "system" | AILanguageModelPromptRole;
 

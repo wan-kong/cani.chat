@@ -19,7 +19,7 @@ export const useChromeAIReady = () => {
             if ('ai' in window && 'languageModel' in window.ai) {
                 window.ai.languageModel.capabilities().then((res) => {
                     status.value = res.available
-                    if (res.available === 'readily') {
+                    if (res.available === 'readily' || res.available==='after-download') {
                         resolve("readily")
                     } else {
                         reject(res.available)
