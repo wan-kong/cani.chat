@@ -37,5 +37,6 @@ const store = useGlobalState()
 
 const handleNewSession = (mode: AIModel) => {
     store.addSession('新会话', mode)
+
 }
 </script>
