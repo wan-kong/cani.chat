@@ -1,7 +1,9 @@
 declare global {
 
     interface Window {
-        ai: {
+        // 旧版 Chrome（<138）命名空间。新版 Chrome 已将工厂提升为全局，
+        // 参见下面的 LanguageModel / Summarizer / Writer / Rewriter。
+        ai?: {
             readonly languageModel: AIAssistantFactory;
             readonly writer: AIWriterFactory;
             readonly rewriter: AIRewriterFactory;
@@ -14,14 +16,23 @@ declare global {
         signal?: AbortSignal;
     }
 
+    // 旧版（capabilities()）与新版（availability()）返回值
     type AICapabilityAvailability = "readily" | "after-download" | "no"
+    // 新版 Chrome built-in AI availability() 返回值
+    type AIAvailability = "unavailable" | "downloadable" | "downloading" | "available"
     type AILanguageModelPromptRole = "user" | 'assistant'
     type AILanguageModelInitialPromptRole = "system" | AILanguageModelPromptRole;
 
-    interface AICreateMonitor {
-        addEventListener(type: "downloadprogress", listener: (ev: { loaded: number; total: number }) => void, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener(type: "downloadprogress", listener: (ev: { loaded: number; total: number }) => void, options?: boolean | EventListenerOptions): void;
-        // 可能在将来添加更多内容
+    // downloadprogress 事件
+    // 新版 Chrome：loaded 为 0..1 的分数，没有 total 字段
+    // 旧版 Chrome：{ loaded, total }（字节数）
+    interface AIDownloadProgressEvent extends Event {
+        readonly loaded: number;
+        readonly total?: number;
+    }
+    interface AICreateMonitor extends EventTarget {
+        addEventListener(type: "downloadprogress", listener: (ev: AIDownloadProgressEvent) => void, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener(type: "downloadprogress", listener: (ev: AIDownloadProgressEvent) => void, options?: boolean | EventListenerOptions): void;
     }
     type AICreateMonitorCallback = (monitor: AICreateMonitor) => void;
 
@@ -219,7 +230,48 @@ declare global {
         [Symbol.asyncIterator](): AsyncIterableIterator<R>;
     }
 
-    type AIModel = keyof typeof window.ai
+    // 新版 Chrome built-in AI（Chrome 138+）将各个工厂提升为全局对象。
+    // 老版本 Chrome（<138）仍然通过 window.ai.* 访问。
+    // 参考: https://developer.chrome.com/docs/ai/prompt-api
+    //       https://developer.chrome.com/docs/ai/inform-users-of-model-download
+    interface AIAvailabilityOptions {
+        // 语言与多模态相关选项（应与后续 create/prompt 调用使用的参数保持一致）
+        expectedInputs?: { type: 'text' | 'audio' | 'image'; languages?: string[] }[];
+        expectedOutputs?: { type: 'text'; languages?: string[] }[];
+    }
+
+    // 新版 LanguageModel 全局（替代 window.ai.languageModel）
+    const LanguageModel: {
+        availability(options?: AIAvailabilityOptions): Promise<AIAvailability>;
+        params(): Promise<{
+            defaultTopK: number;
+            maxTopK: number;
+            defaultTemperature: number;
+            maxTemperature: number;
+        }>;
+        create(options?: AIAssistantCreateOptionsWithOutSystemPrompt | AIAssistantCreateOptionsWithOutInitialPrompts): Promise<AIAssistant>;
+    } | undefined;
+
+    // 新版 Summarizer 全局
+    const Summarizer: {
+        availability(options?: AIAvailabilityOptions): Promise<AIAvailability>;
+        create(options?: Partial<AISummarizerCreateOptions>): Promise<AISummarizer>;
+    } | undefined;
+
+    // 新版 Writer 全局
+    const Writer: {
+        availability(options?: AIAvailabilityOptions): Promise<AIAvailability>;
+        create(options?: AIWriterCreateOptions): Promise<AIWriter>;
+    } | undefined;
+
+    // 新版 Rewriter 全局
+    const Rewriter: {
+        availability(options?: AIAvailabilityOptions): Promise<AIAvailability>;
+        create(options?: AIRewriterCreateOptions): Promise<AIRewriter>;
+    } | undefined;
+
+    // 目前本项目支持的模型键（同时对应 window.ai 的子属性与全局对象名）
+    type AIModel = 'languageModel' | 'writer' | 'rewriter' | 'summarizer'
 
 }
 
