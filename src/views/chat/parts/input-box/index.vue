@@ -45,6 +45,8 @@ const inputVal = computed({
 
 const { isComposing } = useComposition()
 
+// key 为 sessionID：同一会话同一时刻只会有一条生成中的消息，
+// 取消按钮是会话维度的，必须和 key 对齐。
 let cancelMap = new Map<SessionItem['id'], AbortController>()
 
 const { progress, cancelDownload } = useModelDownload()
@@ -73,7 +75,7 @@ const handleSendData = () => {
             update_at: parseTime(Date.now()),
             session_id: sessionID,
         }, sessionID)
-        cancelMap.set(messageID, controller)
+        cancelMap.set(sessionID, controller)
         // 先占位，再发起对话：chatToChrome 的同步错误分支会在微任务内立刻触发
         // onError，若此时占位消息尚未入库，updateMessageItem 就会找不到目标 id，
         // 造成气泡永远卡在 loading 状态。
@@ -109,7 +111,7 @@ const handleSendData = () => {
                     status: 'completed',
                     update_at: parseTime(Date.now()),
                 }, sessionID)
-                cancelMap.delete(messageID)
+                cancelMap.delete(sessionID)
                 store.setUserInputLoading(false, sessionID)
             },
             onError: (error) => {
@@ -119,7 +121,7 @@ const handleSendData = () => {
                     status: 'error',
                     update_at: parseTime(Date.now()),
                 }, sessionID)
-                cancelMap.delete(messageID)
+                cancelMap.delete(sessionID)
                 store.setUserInputLoading(false, sessionID)
             }
         })
@@ -130,13 +132,13 @@ const handleSendData = () => {
 
 const handleCancelData = () => {
     const sessionID = store.activeSessionId
-    const abortFN = cancelMap.get(sessionID)?.abort
-    if (abortFN) {
-        abortFN()
+    const controller = cancelMap.get(sessionID)
+    if (controller) {
+        // 必须在实例上调用 abort()，否则解构出来的 .abort 会丢失 this 绑定
+        controller.abort()
         cancelMap.delete(sessionID)
         store.setUserInputLoading(false, sessionID)
     }
-
 }
 const handleKeyDown = getKeyDownHandler(new Map([
     [
