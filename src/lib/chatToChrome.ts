@@ -114,9 +114,15 @@ export async function chatToChrome<T extends AIModel>(input: string, options: Us
     try {
         if (isAsync) {
             const stream = session[taskKey](input, { ...options?.taskOptions }) as ReadableStream<string>
+            // Chrome 138+ 的 promptStreaming 返回的是增量 delta，需要在本地累积
+            // 拼接后再抛给调用方（旧版返回累积串，遇到 startsWith 的已兼容分支）。
+            let acc = ''
             for await (const chunk of stream) {
-                formateLog('CHAT', `流式对话加载，输出：${chunk}`)
-                options?.onDataUpdate?.(chunk)
+                if (typeof chunk !== 'string' || chunk.length === 0) continue
+                // 兼容旧版本 Chrome 直接返回累积串的行为
+                acc = acc && chunk.startsWith(acc) ? chunk : acc + chunk
+                formateLog('CHAT', `流式对话加载，增量：${chunk}`)
+                options?.onDataUpdate?.(acc)
             }
             options?.onCompleted?.()
         } else {
