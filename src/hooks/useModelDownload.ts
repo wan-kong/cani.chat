@@ -241,8 +241,9 @@ export const useModelDownload = () => {
 
     const markError = (model: AIModel, error: unknown) => {
         const p = ensureProgress(model)
-        // 被我们自己 abort 时保留 canceled 状态
-        if (p.state === 'canceled') return
+        // 被我们自己 abort 时保留 canceled 状态；模型已 ready 时不要被后续
+        // 任务/prompt 错误污染为 error。
+        if (p.state === 'canceled' || p.state === 'ready') return
         p.state = 'error'
         p.error = error instanceof Error ? error.message : String(error)
         controllerMap.delete(model)
