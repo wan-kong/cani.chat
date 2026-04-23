@@ -3,6 +3,8 @@
         <Textarea v-model="inputVal" :disabled="activeUserInput?.disabled"
             class="w-full flex-1 h-0 min-h-5 resize-none focus-visible:shadow-none"
             :placeholder="activeUserInput?.placeholder || DEFAULT_PLACEHOLDER" @keydown="handleKeyDown"></Textarea>
+        <ModelDownloadProgress :model="activeModel" :progress="activeProgress"
+            @cancel="handleCancelDownload" />
         <div class="flex flex-shrink-0 w-full items-center justify-between">
             <div class="flex items-center justify-center text-sm text-slate-500">
                 答案由AI生成，可能存在错误，请注意甄别。
@@ -25,6 +27,7 @@ import { formateLog, getUUID, parseTime } from '@/lib/utils';
 import { chatToChrome } from '@/lib/chatToChrome';
 import { SessionItem } from '@/types/interface';
 import SendButton from './send-button.vue';
+import ModelDownloadProgress from './model-download-progress.vue';
 import { useModelDownload } from '@/hooks/useModelDownload';
 
 const store = useGlobalState()
@@ -44,12 +47,19 @@ const { isComposing } = useComposition()
 
 let cancelMap = new Map<SessionItem['id'], AbortController>()
 
-const { sessionOption } = useModelDownload()
+const { progress, cancelDownload } = useModelDownload()
+
+const activeModel = computed<AIModel>(() => store.activeSession?.model ?? 'languageModel')
+const activeProgress = computed(() => progress[activeModel.value])
+
+const handleCancelDownload = () => {
+    cancelDownload(activeModel.value)
+}
 
 const handleSendData = () => {
     if (inputVal.value) {
         const sessionID = store.activeSessionId
-        const model = store.activeSession?.model ?? 'languageModel'
+        const model = activeModel.value
         const messageID = getUUID()
         const controller = new AbortController()
 
@@ -65,9 +75,8 @@ const handleSendData = () => {
         cancelMap.set(messageID, controller)
         chatToChrome(inputVal.value, {
             model: model,
-            sessionOptions: {
-                ...sessionOption(model),
-            },
+            // chatToChrome 默认会附上 monitor/signal 以跟踪下载进度，
+            // 无需再手动传 sessionOptions.monitor。
             taskOptions: {
                 signal: controller.signal
             },
