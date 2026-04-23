@@ -70,6 +70,7 @@ export async function chatToChrome<T extends AIModel>(input: string, options: Us
 
     const { markReady, markError, sessionOption: defaultSessionOption } = useModelDownload()
 
+    let session: any
     try {
         const factory = resolveModelFactory(mode)
         if (!factory) {
@@ -81,43 +82,57 @@ export async function chatToChrome<T extends AIModel>(input: string, options: Us
             throw new Error(`${mode} 当前不可用（availability=unavailable）`)
         }
 
-        // 若外部没有传入 monitor/signal，则使用默认的，从而跟踪下载进度
+        // 仅在确实可能触发下载时才注入默认 monitor/signal，避免模型已 available
+        // 时 UI 短暂闪烁出 "正在下载..." 状态。
+        const needsDownloadTracking = availability !== 'available'
         const userSession = (options.sessionOptions ?? {}) as any
+        const userHasMonitor = 'monitor' in userSession || 'signal' in userSession
         const sessionOptsFinal = {
-            ...(userSession.monitor || userSession.signal ? {} : defaultSessionOption(mode)),
+            ...(needsDownloadTracking && !userHasMonitor ? defaultSessionOption(mode) : {}),
             ...userSession,
         }
 
-        const session = await factory.create(sessionOptsFinal) as any
+        try {
+            session = await factory.create(sessionOptsFinal)
+        } catch (createError) {
+            // 仅在会话 / 模型创建阶段失败时，才把下载状态标记为 error
+            markError(mode, createError)
+            throw createError
+        }
+
         // 创建成功即视为模型就绪
         markReady(mode)
+    } catch (error) {
+        formateLog('CHAT', `对话出错，错误：${error}`)
+        options?.onError?.(error)
+        return
+    }
 
-        // ts写不明白了，先用any了
-        const taskKey = _getTaskKey(mode, isAsync)
-        try {
-            if (isAsync) {
-                const stream = session[taskKey](input, { ...options?.taskOptions }) as ReadableStream<string>
-                for await (const chunk of stream) {
-                    formateLog('CHAT', `流式对话加载，输出：${chunk}`)
-                    options?.onDataUpdate?.(chunk)
-                }
-                options?.onCompleted?.()
-            } else {
-                const res = await session[taskKey](input, { ...options?.taskOptions }) as string
-                formateLog('CHAT', `对话完成，输出：${res}`)
-                options?.onDataUpdate?.(res)
-                options?.onCompleted?.()
+    // —— 以下属于任务执行阶段；此处出错不应污染下载状态 ——
+    // ts写不明白了，先用any了
+    const taskKey = _getTaskKey(mode, isAsync)
+    try {
+        if (isAsync) {
+            const stream = session[taskKey](input, { ...options?.taskOptions }) as ReadableStream<string>
+            for await (const chunk of stream) {
+                formateLog('CHAT', `流式对话加载，输出：${chunk}`)
+                options?.onDataUpdate?.(chunk)
             }
-        } finally {
-            try {
-                session.destroy?.()
-            } catch {
-                /* ignore */
-            }
+            options?.onCompleted?.()
+        } else {
+            const res = await session[taskKey](input, { ...options?.taskOptions }) as string
+            formateLog('CHAT', `对话完成，输出：${res}`)
+            options?.onDataUpdate?.(res)
+            options?.onCompleted?.()
         }
     } catch (error) {
         formateLog('CHAT', `对话出错，错误：${error}`)
-        markError(options.model, error)
         options?.onError?.(error)
+    } finally {
+        try {
+            session.destroy?.()
+        } catch {
+            /* ignore */
+        }
     }
 }
