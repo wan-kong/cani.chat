@@ -63,9 +63,10 @@ const handleSendData = () => {
         const messageID = getUUID()
         const controller = new AbortController()
 
+        const userInput = inputVal.value
         store.addMessageItem({
             id: getUUID(),
-            content: inputVal.value,
+            content: userInput,
             role: 'user',
             status: 'completed',
             create_at: parseTime(Date.now()),
@@ -73,7 +74,21 @@ const handleSendData = () => {
             session_id: sessionID,
         }, sessionID)
         cancelMap.set(messageID, controller)
-        chatToChrome(inputVal.value, {
+        // 先占位，再发起对话：chatToChrome 的同步错误分支会在微任务内立刻触发
+        // onError，若此时占位消息尚未入库，updateMessageItem 就会找不到目标 id，
+        // 造成气泡永远卡在 loading 状态。
+        store.addMessageItem({
+            id: messageID,
+            content: '正在生成中...',
+            role: 'assistant',
+            status: 'loading',
+            create_at: parseTime(Date.now()),
+            update_at: parseTime(Date.now()),
+            session_id: sessionID,
+        }, sessionID)
+        store.setUserInputLoading(true, sessionID)
+        inputVal.value = ''
+        chatToChrome(userInput, {
             model: model,
             // chatToChrome 默认会附上 monitor/signal 以跟踪下载进度，
             // 无需再手动传 sessionOptions.monitor。
@@ -108,17 +123,6 @@ const handleSendData = () => {
                 store.setUserInputLoading(false, sessionID)
             }
         })
-        inputVal.value = ''
-        store.addMessageItem({
-            id: messageID,
-            content: '正在生成中...',
-            role: 'assistant',
-            status: 'loading',
-            create_at: parseTime(Date.now()),
-            update_at: parseTime(Date.now()),
-            session_id: sessionID,
-        })
-        store.setUserInputLoading(true, sessionID)
     } else {
         formateLog("Submit", "User input data is empty string", "error")
     }
